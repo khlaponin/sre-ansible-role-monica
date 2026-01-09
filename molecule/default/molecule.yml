@@ -7,8 +7,15 @@ lint:
   options:
     config-file: molecule/default/yamllint.yml
 platforms:
-  - name: ansible-role-monica-test
-    image: "geerlingguy/docker-debian9-ansible"
+  - name: debian12
+    image: "geerlingguy/docker-debian12-ansible"
+    command: ${MOLECULE_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+  - name: rocky8
+    image: "geerlingguy/docker-rockylinux8-ansible"
     command: ${MOLECULE_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -27,6 +34,12 @@ provisioner:
         - 502  # All tasks should be named
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
+  config_options:
+    defaults:
+      callbacks_enabled: profile_tasks, timer
+  options:
+    vvv: false
+    skip-tags: molecule-notest
 scenario:
   name: default
 verifier:

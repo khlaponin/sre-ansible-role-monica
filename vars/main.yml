@@ -1,1 +1,5 @@
 
+
+# This file is intentionally left empty.
+# Use it for role-wide variable overrides if needed.
+# OS-specific variables are loaded from vars/<Distribution>.yml and vars/<OSFamily>.yml

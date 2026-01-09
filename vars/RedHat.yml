@@ -1,0 +1,15 @@
+monica_packages:
+  - git
+  - nginx
+  - php
+  - php-cli
+  - php-fpm
+  - php-mysqlnd
+monica_web_user: "nginx"
+monica_web_group: "nginx"
+monica_service_name: "nginx"
+php_fpm_service: "php-fpm"
+php_fpm_fastcgi: "127.0.0.1:9000"
+nginx_site_dest: "/etc/nginx/conf.d/monica.conf"
+default_nginx_site_path: ""
+monica_nologin_shell: "/sbin/nologin"

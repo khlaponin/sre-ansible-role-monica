@@ -1,0 +1,55 @@
+# General OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.env/
+.envrc
+
+# Packaging / distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage*
+htmlcov/
+.tox/
+
+# Ansible
+*.retry
+*.vault
+
+# Molecule
+.molecule/
+.molecule/*
+.cache/
+
+# Editor/IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Local overrides
+vars/local.yml
+host_vars/*/vault.yml
+group_vars/*/vault.yml
+
+# Misc
+*.bak
+*.orig

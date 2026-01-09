@@ -1,0 +1,11 @@
+- name: reload php-fpm
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ php_fpm_service }}"
+    state: reloaded
+
+- name: reload nginx
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ monica_service_name }}"
+    state: reloaded

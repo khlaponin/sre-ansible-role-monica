@@ -1,13 +1,36 @@
 ---
-- name: install packages
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
+- name: Discover OS variable files
+  stat:
+    path: "{{ role_path }}/vars/{{ item }}"
+  register: monica_varfiles
   loop:
-    - git
-    - apt-transport-https
-    - nginx
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "main.yml"
+
+- name: Load OS-specific variables (only existing files)
+  include_vars:
+    file: "{{ item.stat.path }}"
+  loop: "{{ monica_varfiles.results }}"
+  when: item.stat.exists
+
+- name: Assert required variables are defined
+  assert:
+    that:
+      - monica_packages is defined
+      - monica_web_group is defined
+      - monica_service_name is defined
+      - php_fpm_service is defined
+      - nginx_site_dest is defined
+    fail_msg: "Required role variables are missing for this OS. Check vars/<OS>.yml."
+
+- name: install required packages
+  package:
+    name: "{{ monica_packages }}"
+    state: present
+  notify:
+    - reload php-fpm
+
 
 - name: check out master branch
   git:
@@ -18,53 +41,9 @@
 - name: Add the user
   user:
     name: monicahq
-    shell: /usr/bin/nologin
+    shell: "{{ monica_nologin_shell | default('/usr/sbin/nologin') }}"
     home: /srv/monicahq
 
-- name: Install sury key
-  apt_key:
-    url: 'https://packages.sury.org/php/apt.gpg'
-    state: present
-
-- name: Add sury repositories
-  apt_repository:
-    repo: "deb https://packages.sury.org/php/ stretch main"
-    state: present
-    update_cache: yes
-    filename: 'sury'
-
-- name: install php dependencies
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-  loop:
-    - php7.3
-    - php7.3-cli
-    - php7.3-intl
-    - php7.3-iconv
-    - php7.3-fpm
-    - php7.3-curl
-    - php7.3-gd
-    - php7.3-mysql
-    - php7.3-mysqli
-    - php7.3-opcache
-    - php7.3-json
-    - php7.3-mbstring
-    - php7.3-soap
-    - php7.3-xml
-    - php7.3-zip
-    - php7.3-gmp
-    - php7.3-bcmath
-    - php-memcached
-    - php-xdebug
-    - php-redis
-
-- name: reload service php-fcgi
-  become: true
-  systemd:
-    name: php7.3-fpm
-    state: reloaded
 
 - name: install composer
   include_role:
@@ -103,7 +82,7 @@
     state: directory
     recurse: yes
     owner: monicahq
-    group: www-data
+    group: "{{ monica_web_group }}"
 
 - name: Put right permissions to storage
   file:
@@ -114,13 +93,14 @@
 - name: Create nginx vhost config
   template:
     src: monicahq.conf.j2
-    dest: /etc/nginx/sites-enabled/monica.conf
-- name: Remove default nginx configuration
+    dest: "{{ nginx_site_dest }}"
+  notify:
+    - reload nginx
+
+- name: Remove default nginx configuration (Debian family)
   file:
-    path: /etc/nginx/sites-enabled/default
+    path: "{{ default_nginx_site_path }}"
     state: absent
-- name: reload service nginx
-  become: true
-  systemd:
-    name: nginx
-    state: reloaded
+  when: default_nginx_site_path | default('') | length > 0
+  notify:
+    - reload nginx

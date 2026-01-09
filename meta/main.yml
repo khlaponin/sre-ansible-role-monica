@@ -4,12 +4,15 @@ galaxy_info:
   description: Install and maintain Monica CRM
   company: Acme, Inc.
   license: Apache 2.0
-  min_ansible_version: 2.7
+  min_ansible_version: 2.10
 
   platforms:
     - name: EL
       versions:
-        - 7
+        - 8
+    - name: Debian
+      versions:
+        - 12
 
   galaxy_tags:
     - system

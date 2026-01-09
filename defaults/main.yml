@@ -1,1 +1,4 @@
-
+monica_version: "3.10.0"
+monica_db_name: "monica"
+nginx_server_name: "_"
+monica_app_env: "production"

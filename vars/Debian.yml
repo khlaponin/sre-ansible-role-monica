@@ -1,0 +1,14 @@
+monica_packages:
+  - git
+  - nginx
+  - php8.2
+  - php8.2-cli
+  - php8.2-fpm
+  - php8.2-mysql
+monica_web_user: "www-data"
+monica_web_group: "www-data"
+monica_service_name: "nginx"
+php_fpm_service: "php8.2-fpm"
+php_fpm_fastcgi: "unix:/var/run/php/php8.2-fpm.sock"
+nginx_site_dest: "/etc/nginx/sites-enabled/monica.conf"
+default_nginx_site_path: "/etc/nginx/sites-enabled/default"
